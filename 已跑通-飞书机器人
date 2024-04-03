@@ -1,0 +1,48 @@
+import requests
+import json
+import time
+import hmac
+import hashlib
+import base64
+
+def send_message_to_feishu(message, app_secret):
+    # 替换成你的飞书机器人 Webhook 地址
+    webhook_url = 'https://open.feishu.cn/open-apis/bot/v2/hook/d6ce0297-a2b0-49ab-8f14-9161dd38d8f4'
+
+    # 构建请求数据
+    headers = {'Content-Type': 'application/json'}
+
+    # 获取当前时间戳（毫秒级）
+    timestamp = int(time.time() * 1000)
+
+    # 构建待签名字符串
+    string_to_sign = '{}\n{}'.format(timestamp, app_secret)
+
+    # 计算签名
+    signature = hmac.new(app_secret.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+    signature_base64 = base64.b64encode(signature).decode()
+
+    # 添加签名到请求头部
+    headers['X-Signature'] = signature_base64
+
+    # 获取当前时间并格式化
+    current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
+    # 在消息内容中包含任务完成的时间和原始消息文本
+    data = {
+        "msg_type": "text",
+        "content": {
+            "text": "任务已完成！\n完成时间：" + current_time + "\n任务类型：" + message
+        }
+    }
+
+    # 发送 POST 请求
+    response = requests.post(webhook_url, headers=headers, data=json.dumps(data))
+
+    # 打印响应结果
+    print(response.text)
+
+
+# 在程序执行完后调用该函数发送消息
+app_secret = 'j3V3bxE6FCiVbyeX6gT64d'  # 替换成你的飞书机器人 app_secret
+send_message_to_feishu("自动化任务-搜索", app_secret)
