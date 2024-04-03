@@ -1,0 +1,49 @@
+from playwright.sync_api import Playwright, sync_playwright, expect
+import random
+import time
+
+
+def run(playwright: Playwright) -> None:
+    browser = playwright.chromium.launch(headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto("https://www.baidu.com/s?wd=%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E6%B5%8B%E8%AF%95&pn=10&oq=%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E6%B5%8B%E8%AF%95&ie=utf-8&usm=4&fenlei=256&rsv_idx=1&rsv_pq=f597d791004867c6&rsv_t=e934st%2Fib2g83louso%2BFczqhnF6XmQRnhaNLiAU25Q2XHAl%2BV0O2n6l7k%2BY&rsv_page=1")
+
+    for i in range(1):
+        try:
+            # 打印当前页数
+            print('当前页数为：', i)
+            page.get_by_role("link", name="下一页 >").click(timeout=3000000)
+
+            # 获取所有匹配指定XPath的元素
+            elements = page.query_selector_all('//*[@id="30"]/div/div[1]/h3/a')
+            # 存储每个元素的文本内容
+            element_texts = [element.text_content() for element in elements]
+
+            # 逐行打印元素的文本内容
+            print("提取的内容为:")
+            for text in element_texts:
+                print(text)
+                # print('\n')
+
+            # 生成随机等待时长（1到3秒之间）
+            wait_time = random.uniform(1, 20)
+            print(f"等待 {wait_time} 秒")
+            time.sleep(wait_time)  # 等待随机时长
+
+        except TimeoutError:
+            print("点击操作超时")
+
+
+
+    # 循环结束后保持浏览器打开
+    print("循环结束，保持浏览器打开")
+    input("按任意键关闭浏览器")
+
+    # ---------------------
+    context.close()
+    browser.close()
+
+
+with sync_playwright() as playwright:
+    run(playwright)
