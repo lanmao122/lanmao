@@ -1,0 +1,25 @@
+import random
+from _pydatetime import time
+from openpyxl.worksheet import page
+
+# 生成随机等待时长（1到25秒之间）
+wait_time = random.uniform(1, 25)
+print(f"等待 {wait_time} 秒")
+time.sleep(wait_time)  # 等待随机时长
+
+
+# 页面加载等待时长3分钟
+page.get_by_role("link", name="下一页 >").click(timeout=3000000)
+
+
+# 循环结束后保持浏览器打开
+print("循环结束，保持浏览器打开")
+input("按任意键关闭浏览器")
+
+
+
+
+
+
+
+
