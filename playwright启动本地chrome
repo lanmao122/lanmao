@@ -1,0 +1,16 @@
+from playwright.sync_api import sync_playwright
+
+def main():
+    with sync_playwright() as p:
+        browser = p.chromium.launch_persistent_context(
+            executable_path="C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
+            user_data_dir="C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data",
+            headless=False
+        )
+        page = browser.new_page()
+        page.goto("https://www.zhihu.com/")  # 这里可以替换为您需要打开的网址
+        # 执行其他操作...
+        browser.close()
+
+if __name__ == "__main__":
+    main()
