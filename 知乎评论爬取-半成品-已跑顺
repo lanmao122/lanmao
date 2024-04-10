@@ -1,0 +1,52 @@
+from playwright.sync_api import sync_playwright
+import random
+import time
+
+def main():
+    # 启动 Playwright
+    with sync_playwright() as p:
+        # 创建浏览器实例，设置 headless 参数为 False
+        browser = p.chromium.launch_persistent_context(
+            executable_path="C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
+            user_data_dir="C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data",
+            headless=False,
+            args=['--disable-blink-features=AutomationControlled']  # 添加禁用代码
+        )
+
+        # 创建新页面
+        page = browser.new_page()
+
+        # 打开知乎首页
+        page.goto('https://www.zhihu.com/')
+
+        # 等待页面加载完成
+        page.wait_for_load_state('networkidle')
+
+        # 在页面中查找所有包含 "评论" 文字的按钮
+        comment_buttons = page.query_selector_all('text=评论')
+
+        # 循环点击每个评论按钮
+        for i, button in enumerate(comment_buttons, start=1):
+            try:
+                button.click()
+                print(f'这是第 {i} 次点击')
+
+                # 等待页面加载完成
+                page.wait_for_load_state('networkidle')
+
+                # 生成随机等待时长（1到3秒之间）
+                wait_time = random.uniform(1, 5)
+                print(f"等待 {wait_time} 秒")
+                page.wait_for_timeout(wait_time * 1000)  # 等待随机时长
+
+            except TimeoutError:
+                print("等待选择器超时")
+
+        # 循环结束后保持浏览器打开
+        print("循环结束，保持浏览器打开")
+        input("按任意键关闭浏览器")
+        # 关闭浏览器
+        browser.close()
+
+if __name__ == '__main__':
+    main()
